@@ -1,0 +1,124 @@
+Source: consul
+Section: devel
+Priority: extra
+Maintainer: Debian Go Packaging Team <pkg-go-maintainers@lists.alioth.debian.org>
+Uploaders: Dmitry Smirnov <onlyjob@debian.org>,
+           Martín Ferrari <tincho@debian.org>,
+           Tianon Gravi <tianon@debian.org>,
+           Tim Potter <tpot@hpe.com>,
+Build-Depends: debhelper (>= 9),
+               dh-golang,
+               golang-any,
+               golang-github-armon-circbuf-dev,
+               golang-github-armon-go-metrics-dev,
+               golang-github-armon-go-radix-dev,
+               golang-github-elazarl-go-bindata-assetfs-dev (>= 0.0~git20151224~),
+               golang-github-fsouza-go-dockerclient-dev,
+               golang-github-hashicorp-go-checkpoint-dev,
+               golang-github-hashicorp-go-cleanhttp-dev,
+               golang-github-hashicorp-go-memdb-dev,
+               golang-github-hashicorp-go-msgpack-dev,
+               golang-github-hashicorp-go-reap-dev,
+               golang-github-hashicorp-go-syslog-dev,
+               golang-github-hashicorp-go-uuid-dev,
+               golang-github-hashicorp-golang-lru-dev (>= 0.0~git20160207~),
+               golang-github-hashicorp-hcl-dev,
+               golang-github-hashicorp-hil-dev,
+               golang-github-hashicorp-logutils-dev,
+               golang-github-hashicorp-memberlist-dev (>= 0.0~git20160225~),
+               golang-github-hashicorp-raft-boltdb-dev,
+               golang-github-hashicorp-raft-dev,
+               golang-github-hashicorp-scada-client-dev,
+               golang-github-hashicorp-serf-dev (>= 0.7.0~),
+               golang-github-hashicorp-yamux-dev (>= 0.0~git20151129~),
+               golang-github-inconshreveable-muxado-dev,
+               golang-github-miekg-dns-dev,
+               golang-github-mitchellh-cli-dev,
+               golang-github-mitchellh-copystructure-dev,
+               golang-github-mitchellh-mapstructure-dev,
+               golang-github-ryanuber-columnize-dev,
+               golang-golang-x-sys-dev (>= 0.0~git20161012~),
+Standards-Version: 3.9.8
+Homepage: https://github.com/hashicorp/consul
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-go/packages/consul.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-go/packages/consul.git
+XS-Go-Import-Path: github.com/hashicorp/consul
+
+Package: golang-github-hashicorp-consul-dev
+Architecture: all
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         golang-github-armon-go-metrics-dev,
+         golang-github-armon-go-radix-dev,
+         golang-github-hashicorp-go-cleanhttp-dev,
+         golang-github-hashicorp-go-memdb-dev,
+         golang-github-hashicorp-go-msgpack-dev,
+         golang-github-hashicorp-go-uuid-dev,
+         golang-github-hashicorp-golang-lru-dev (>= 0.0~git20160207~),
+         golang-github-hashicorp-hcl-dev,
+         golang-github-hashicorp-hil-dev,
+         golang-github-hashicorp-memberlist-dev (>= 0.0~git20160225~),
+         golang-github-hashicorp-raft-boltdb-dev,
+         golang-github-hashicorp-raft-dev,
+         golang-github-hashicorp-serf-dev (>= 0.7.0~),
+         golang-github-hashicorp-yamux-dev (>= 0.0~git20151129~),
+         golang-github-inconshreveable-muxado-dev,
+         golang-github-miekg-dns-dev,
+         golang-github-mitchellh-cli-dev,
+         golang-github-mitchellh-copystructure-dev,
+         golang-golang-x-sys-dev (>= 0.0~git20161012~),
+Description: tool for service discovery, monitoring and configuration (source)
+ Consul is a tool for service discovery and configuration. Consul is
+ distributed, highly available, and extremely scalable.
+ .
+ Consul provides several key features:
+ .
+  - Service Discovery - Consul makes it simple for services to register
+    themselves and to discover other services via a DNS or HTTP interface.
+    External services such as SaaS providers can be registered as well.
+ .
+  - Health Checking - Health Checking enables Consul to quickly alert operators
+    about any issues in a cluster. The integration with service discovery
+    prevents routing traffic to unhealthy hosts and enables service level
+    circuit breakers.
+ .
+  - Key/Value Storage - A flexible key/value store enables storing dynamic
+    configuration, feature flagging, coordination, leader election and more.
+    The simple HTTP API makes it easy to use anywhere.
+ .
+  - Multi-Datacenter - Consul is built to be datacenter aware, and can support
+    any number of regions without complex configuration.
+ .
+ Consul runs on Linux, Mac OS X, and Windows. It is recommended to run the
+ Consul servers only on Linux, however.
+ .
+ This package contains the source.
+
+Package: consul
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Built-Using: ${misc:Built-Using}
+Description: tool for service discovery, monitoring and configuration
+ Consul is a tool for service discovery and configuration. Consul is
+ distributed, highly available, and extremely scalable.
+ .
+ Consul provides several key features:
+ .
+  - Service Discovery - Consul makes it simple for services to register
+    themselves and to discover other services via a DNS or HTTP interface.
+    External services such as SaaS providers can be registered as well.
+ .
+  - Health Checking - Health Checking enables Consul to quickly alert operators
+    about any issues in a cluster. The integration with service discovery
+    prevents routing traffic to unhealthy hosts and enables service level
+    circuit breakers.
+ .
+  - Key/Value Storage - A flexible key/value store enables storing dynamic
+    configuration, feature flagging, coordination, leader election and more.
+    The simple HTTP API makes it easy to use anywhere.
+ .
+  - Multi-Datacenter - Consul is built to be datacenter aware, and can support
+    any number of regions without complex configuration.
+ .
+ Consul runs on Linux, Mac OS X, and Windows. It is recommended to run the
+ Consul servers only on Linux, however.

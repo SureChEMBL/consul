@@ -1,0 +1,12 @@
+Disable tests that access the network.
+
+--- a/command/agent/command_test.go
++++ b/command/agent/command_test.go
+@@ -251,6 +251,7 @@
+ }
+ 
+ func TestSetupScadaConn(t *testing.T) {
++	test.Skip("Connects to the network.")
+ 	// Create a config and assign an infra name
+ 	conf1 := nextConfig()
+ 	conf1.AtlasInfrastructure = "hashicorp/test1"

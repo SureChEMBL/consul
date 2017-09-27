@@ -1,0 +1,12 @@
+--- a/tlsutil/config_test.go
++++ b/tlsutil/config_test.go
+@@ -254,6 +254,9 @@
+ }
+ 
+ func TestConfig_outgoingWrapper_BadDC(t *testing.T) {
++	if testing.Short() {
++		t.Skip("Skipping test in short mode.")
++	}
+ 	config := &Config{
+ 		CAFile:               "../test/hostname/CertAuth.crt",
+ 		CertFile:             "../test/hostname/Alice.crt",

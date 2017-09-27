@@ -1,0 +1,204 @@
+Last-Update: 2016-06-15
+Forwarded: not-needed
+Origin: upstream
+Bug-Upstream: https://github.com/hashicorp/nomad/issues/1127
+Description: post 0.6.4 API changes as required by Nomad-0.3.2.
+
+--- a/api/agent.go
++++ b/api/agent.go
+@@ -256,14 +256,14 @@
+ // strings for compatibility (though a newer version of Consul will still be
+ // required to use this API).
+ func (a *Agent) UpdateTTL(checkID, output, status string) error {
+ 	switch status {
+-	case "pass", "passing":
+-		status = "passing"
+-	case "warn", "warning":
+-		status = "warning"
+-	case "fail", "critical":
+-		status = "critical"
++	case "pass", HealthPassing:
++		status = HealthPassing
++	case "warn", HealthWarning:
++		status = HealthWarning
++	case "fail", HealthCritical:
++		status = HealthCritical
+ 	default:
+ 		return fmt.Errorf("Invalid status: %s", status)
+ 	}
+ 
+--- a/api/api.go
++++ b/api/api.go
+@@ -2,11 +2,13 @@
+ 
+ import (
+ 	"bytes"
+ 	"crypto/tls"
++	"crypto/x509"
+ 	"encoding/json"
+ 	"fmt"
+ 	"io"
++	"io/ioutil"
+ 	"log"
+ 	"net"
+ 	"net/http"
+ 	"net/url"
+@@ -121,8 +123,32 @@
+ 	// which overrides the agent's default token.
+ 	Token string
+ }
+ 
++// TLSConfig is used to generate a TLSClientConfig that's useful for talking to
++// Consul using TLS.
++type TLSConfig struct {
++	// Address is the optional address of the Consul server. The port, if any
++	// will be removed from here and this will be set to the ServerName of the
++	// resulting config.
++	Address string
++
++	// CAFile is the optional path to the CA certificate used for Consul
++	// communication, defaults to the system bundle if not specified.
++	CAFile string
++
++	// CertFile is the optional path to the certificate for Consul
++	// communication. If this is set then you need to also set KeyFile.
++	CertFile string
++
++	// KeyFile is the optional path to the private key for Consul communication.
++	// If this is set then you need to also set CertFile.
++	KeyFile string
++
++	// InsecureSkipVerify if set to true will disable TLS host verification.
++	InsecureSkipVerify bool
++}
++
+ // DefaultConfig returns a default configuration for the client. By default this
+ // will pool and reuse idle connections to Consul. If you have a long-lived
+ // client object, this is the desired behavior and should make the most efficient
+ // use of the connections to Consul. If you don't reuse a client object , which
+@@ -193,19 +219,72 @@
+ 			log.Printf("[WARN] client: could not parse CONSUL_HTTP_SSL_VERIFY: %s", err)
+ 		}
+ 
+ 		if !doVerify {
+-			transport := transportFn()
+-			transport.TLSClientConfig = &tls.Config{
++			tlsClientConfig, err := SetupTLSConfig(&TLSConfig{
+ 				InsecureSkipVerify: true,
++			})
++
++			// We don't expect this to fail given that we aren't
++			// parsing any of the input, but we panic just in case
++			// since this doesn't have an error return.
++			if err != nil {
++				panic(err)
+ 			}
++
++			transport := transportFn()
++			transport.TLSClientConfig = tlsClientConfig
+ 			config.HttpClient.Transport = transport
+ 		}
+ 	}
+ 
+ 	return config
+ }
+ 
++// TLSConfig is used to generate a TLSClientConfig that's useful for talking to
++// Consul using TLS.
++func SetupTLSConfig(tlsConfig *TLSConfig) (*tls.Config, error) {
++	tlsClientConfig := &tls.Config{
++		InsecureSkipVerify: tlsConfig.InsecureSkipVerify,
++	}
++
++	if tlsConfig.Address != "" {
++		server := tlsConfig.Address
++		hasPort := strings.LastIndex(server, ":") > strings.LastIndex(server, "]")
++		if hasPort {
++			var err error
++			server, _, err = net.SplitHostPort(server)
++			if err != nil {
++				return nil, err
++			}
++		}
++		tlsClientConfig.ServerName = server
++	}
++
++	if tlsConfig.CertFile != "" && tlsConfig.KeyFile != "" {
++		tlsCert, err := tls.LoadX509KeyPair(tlsConfig.CertFile, tlsConfig.KeyFile)
++		if err != nil {
++			return nil, err
++		}
++		tlsClientConfig.Certificates = []tls.Certificate{tlsCert}
++	}
++
++	if tlsConfig.CAFile != "" {
++		data, err := ioutil.ReadFile(tlsConfig.CAFile)
++		if err != nil {
++			return nil, fmt.Errorf("failed to read CA file: %v", err)
++		}
++
++		caPool := x509.NewCertPool()
++		if !caPool.AppendCertsFromPEM(data) {
++			return nil, fmt.Errorf("failed to parse CA certificate")
++		}
++		tlsClientConfig.RootCAs = caPool
++	}
++
++	return tlsClientConfig, nil
++}
++
+ // Client provides a client to the Consul API
+ type Client struct {
+ 	config Config
+ }
+--- a/api/health.go
++++ b/api/health.go
+@@ -3,8 +3,18 @@
+ import (
+ 	"fmt"
+ )
+ 
++const (
++	// HealthAny is special, and is used as a wild card,
++	// not as a specific state.
++	HealthAny      = "any"
++	HealthUnknown  = "unknown"
++	HealthPassing  = "passing"
++	HealthWarning  = "warning"
++	HealthCritical = "critical"
++)
++
+ // HealthCheck is used to represent a single check
+ type HealthCheck struct {
+ 	Node        string
+ 	CheckID     string
+@@ -84,9 +94,9 @@
+ 	if tag != "" {
+ 		r.params.Set("tag", tag)
+ 	}
+ 	if passingOnly {
+-		r.params.Set("passing", "1")
++		r.params.Set(HealthPassing, "1")
+ 	}
+ 	rtt, resp, err := requireOK(h.c.doRequest(r))
+ 	if err != nil {
+ 		return nil, nil, err
+@@ -107,13 +117,13 @@
+ // State is used to retrieve all the checks in a given state.
+ // The wildcard "any" state can also be used for all checks.
+ func (h *Health) State(state string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) {
+ 	switch state {
+-	case "any":
+-	case "warning":
+-	case "critical":
+-	case "passing":
+-	case "unknown":
++	case HealthAny:
++	case HealthWarning:
++	case HealthCritical:
++	case HealthPassing:
++	case HealthUnknown:
+ 	default:
+ 		return nil, nil, fmt.Errorf("Unsupported state: %v", state)
+ 	}
+ 	r := h.c.newRequest("GET", "/v1/health/state/"+state)

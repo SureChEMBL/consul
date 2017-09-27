@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --buildsystem=golang --with=golang
+
+override_dh_auto_test:
+	dh_auto_test -- -test.short
+
+override_dh_install:
+	## Do not install "github.com/hashicorp/consul/command" to -dev package.
+	dh_install -X/src/github.com/hashicorp/consul/command

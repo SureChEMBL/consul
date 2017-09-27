@@ -1,0 +1,2 @@
+## Disable syslog testing:
+command/agent/syslog_test.go

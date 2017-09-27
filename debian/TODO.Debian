@@ -1,0 +1,27 @@
+## Documentation
+
+ Install documentation from
+
+    website/source/docs
+    website/source/intro
+
+ Drop non-free design:
+
+    website/source/layouts
+    website/source/assets
+
+
+## UI
+
+ Install UI; replace non-dfsg javascripts.
+
+    https://github.com/hashicorp/consul/issues/1797
+
+ Make .service file for UI.
+
+
+## Conf files dir
+
+ Install "/etc/consul.d".
+
+ See https://www.consul.io/intro/getting-started/services.html

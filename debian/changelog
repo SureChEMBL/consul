@@ -1,0 +1,61 @@
+consul (0.6.4~dfsg-4) unstable; urgency=medium
+
+  [ Paul Tagliamonte ]
+  * Correct the Vcs-Git and Vcs-Browser URL to the correct URI.
+
+  [ Martín Ferrari ]
+  * Add myself to Uploaders.
+  * debian/control: Remove golang-go dependency from -dev package.
+  * debian/control: Replace golang-go with golang-any in Build-Depends.
+  * Add versioned dependency on golang-golang-x-sys-dev, to solve build
+    issues in arm64.
+  * Drop old package name in dependencies.
+  * Disable test that runs so long it gets killed.
+  * Disable tests that access the network.
+
+ -- Konstantinos Margaritis <markos@debian.org>  Thu, 10 Aug 2017 13:33:16 +0300
+
+consul (0.6.4~dfsg-3) unstable; urgency=medium
+
+  * Added "golang-github-hashicorp-go-cleanhttp-dev" to -dev's Depends.
+
+ -- Dmitry Smirnov <onlyjob@debian.org>  Sat, 18 Jun 2016 20:47:29 +1000
+
+consul (0.6.4~dfsg-2) unstable; urgency=medium
+
+  * Drop "consul/command" and corresponding Depends from -dev package.
+  * New patch with post-0.6.4 API changes.
+  * Standards-Version: 3.9.8.
+  * Vcs-Git URL to HTTPS.
+
+ -- Dmitry Smirnov <onlyjob@debian.org>  Wed, 15 Jun 2016 20:32:00 +1000
+
+consul (0.6.4~dfsg-1) unstable; urgency=medium
+
+  [ Tim Potter ]
+  * Remove unneeded dependency on golang-github-armon-gomdb-dev
+
+  [ Dmitry Smirnov ]
+  * New upstream release.
+  * (Build-)Depends:
+    + golang-github-hashicorp-go-uuid-dev
+    + golang-github-hashicorp-hil-dev
+    + golang-github-mitchellh-copystructure-dev
+
+ -- Dmitry Smirnov <onlyjob@debian.org>  Mon, 11 Apr 2016 16:45:53 +1000
+
+consul (0.6.3~dfsg-2) unstable; urgency=medium
+
+  * Drop unused "consul-migrate".
+  * (Build-)Depends:
+    - golang-github-hashicorp-consul-migrate-dev
+  * Standards-Version: 3.9.7.
+  * Added myself to Uploaders.
+
+ -- Dmitry Smirnov <onlyjob@debian.org>  Wed, 23 Mar 2016 16:41:11 +1100
+
+consul (0.6.3~dfsg-1) unstable; urgency=medium
+
+  * Initial release (Closes: #804277).
+
+ -- Tianon Gravi <tianon@debian.org>  Fri, 06 Nov 2015 12:20:36 -0800

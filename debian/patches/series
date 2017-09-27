@@ -1,0 +1,4 @@
+#0001-update-test-fixture-paths.patch
+nomad-0.3.2.patch
+0002-disable-slow-test.patch
+0003-disable-network-access-tests.patch
